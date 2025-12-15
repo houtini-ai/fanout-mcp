@@ -8,6 +8,7 @@
 
 ✅ **Research Phase:** Complete  
 ✅ **Implementation Phase:** Complete (MVP)  
+✅ **Visual Dashboard:** Interactive artifact with technical metrics  
 📅 **Completed:** December 15, 2024
 
 ---
@@ -97,6 +98,39 @@ Comprehensive coverage check for https://example.com/installation-guide
 
 ---
 
+## Output
+
+### Interactive Visual Dashboard
+
+Claude automatically creates a modern, interactive HTML artifact displaying:
+
+**Main Dashboard:**
+- Coverage score with animated gradient progress bar
+- Query breakdown statistics (covered/partial/gaps)
+- Color-coded sections (blue = prerequisite, purple = core, orange = follow-up)
+- Expandable query cards showing evidence, gaps, and recommendations
+- Prioritized action items (high/medium priority)
+
+**Technical Analysis Section** (Collapsible):
+- **Content Metrics:** Characters, words, readability score, technical density, sentence/word statistics
+- **Query Decomposition:** Model used, distribution vs targets, quality scores (specificity, realism, domain term usage)
+- **Self-RAG Validation:** Coverage breakdown, evidence metrics (quote accuracy, hallucination rate, confidence)
+- **Processing Metrics:** Timing breakdown per phase, API calls, estimated cost
+- **Content Extraction:** Method, quality scores, noise filtering, structure preservation
+
+The dashboard uses a modern shadcn-inspired design with subtle gradients, smooth transitions, and excellent UX.
+
+### Markdown Report
+
+The tool also provides a detailed markdown report with:
+- Coverage score (0-100)
+- Per-query assessment with evidence quotes
+- Gap descriptions and recommendations
+- Prioritized action items
+- Technical metrics as JSON
+
+---
+
 ## How It Works
 
 ### 1. Content Fetching
@@ -112,65 +146,31 @@ Generates a query graph using Least-to-Most prompting:
 - **Core queries:** Main questions the content should answer
 - **Follow-up queries:** Advanced topics and edge cases
 
+Uses `<thinking>` tags to prevent JSON parsing errors.
+
 ### 3. Coverage Assessment
 Uses Self-RAG (Self-Reflective RAG) to validate coverage:
-- **COVERED:** Exact evidence found with quotes
-- **PARTIAL:** Topic mentioned but incomplete
-- **GAP:** No coverage found
+- **COVERED:** Exact evidence found with quotes (90-100% confidence)
+- **PARTIAL:** Topic mentioned but incomplete (40-89% confidence)
+- **GAP:** No coverage found (0-39% confidence)
 
-### 4. Report Generation
-Produces a markdown report with:
-- Coverage score (0-100)
-- Per-query assessment with evidence
-- Prioritized recommendations
-- Statistics breakdown
+Evidence quotes are extracted verbatim - no hallucinations.
 
----
+### 4. Technical Metrics Collection
+Tracks comprehensive metrics throughout the analysis:
+- **Timing:** Per-phase breakdown (fetch, query generation, assessment)
+- **Content Quality:** Readability, technical density, structure
+- **Query Quality:** Specificity, realism, distribution accuracy
+- **Evidence Quality:** Quote accuracy, hallucination rate, confidence scores
+- **Assessment Quality:** Overclaim/underclaim rates, accuracy
 
-## Output Format
-
-```markdown
-## Query Coverage Analysis
-
-**URL:** https://example.com/article
-**Title:** Article Title
-**Coverage Score:** 73/100
-**Analysis Date:** 2024-12-15
-
-### Query Graph Breakdown
-
-#### PRE-REQUISITE QUERIES (Foundation)
-✅ "What is X?" - **COVERED** (95% confidence)
-   Evidence: "..." (line 15-23)
-
-❌ "What is Y?" - **GAP**
-   Recommendation: Add 2-3 sentence overview
-   Priority: HIGH
-
-#### CORE QUERIES (Main Content)
-[...]
-
-#### FOLLOW-UP QUERIES (Advanced)
-[...]
-
-### Summary Recommendations
-
-**Immediate Actions** (Priority: HIGH)
-1. Add definition of Y with examples (est. 200 words)
-2. Include pricing comparison table
-
-**Future Enhancements** (Priority: MEDIUM)
-3. Add advanced configuration examples
-4. Link to related troubleshooting guide
-
----
-
-**Coverage Breakdown:**
-- Total Queries: 15
-- Fully Covered: 8 (53%)
-- Partially Covered: 4 (27%)
-- Gaps Identified: 3 (20%)
-```
+### 5. Visual Report Generation
+Instructs Claude to create an interactive HTML artifact with:
+- Modern UI with gradients and animations
+- Expandable cards for detailed information
+- Collapsible technical section for deep metrics
+- Mobile-responsive design
+- Accessible color schemes
 
 ---
 
@@ -187,13 +187,22 @@ Reuses the proven approach from voice-analysis MCP:
 Claude Sonnet 4.5 powered:
 - Query decomposition prompts (research-validated)
 - Self-RAG assessment prompts (adversarial validation)
-- Batched processing (5 queries per API call)
+- `<thinking>` tags for reliable JSON parsing
+- Evidence-based validation (no hallucinations)
+
+### Metrics Layer
+Comprehensive tracking:
+- Content analysis (readability, density, structure)
+- Query quality scoring (specificity, realism, distribution)
+- Evidence validation (accuracy, hallucination detection)
+- Processing performance (timing, cost estimation)
 
 ### Report Layer
-Structured markdown output:
-- Evidence quotes from actual content
-- Actionable recommendations
-- Clear priority levels
+Dual output format:
+- Markdown report with technical JSON
+- Interactive HTML artifact via Claude
+- Modern shadcn-inspired design
+- Collapsible technical deep-dive section
 
 ---
 
@@ -219,12 +228,16 @@ All research is in `/research`:
 ✅ Self-RAG coverage assessment  
 ✅ Evidence-based recommendations  
 ✅ Three analysis depths  
+✅ Interactive visual dashboard with technical metrics  
+✅ Comprehensive quality scoring  
+✅ Performance tracking  
 
 ### Planned (Future)
 - Batch URL analysis (v1.1)
 - Coverage matrix across multiple pages
 - Sitemap analysis with interactive dashboard
 - JSON export for automation
+- Historical tracking and comparison
 
 ---
 
@@ -235,6 +248,7 @@ All research is in `/research`:
 - **cheerio** - HTML parsing
 - **turndown** - Markdown conversion
 - **TypeScript** - Implementation
+- **React** (via Claude artifacts) - Interactive visualization
 
 ---
 
@@ -244,8 +258,38 @@ All research is in `/research`:
 ✅ **Reverse HyDE** - Emerging but validated  
 ✅ **Self-RAG** - Perfect for coverage assessment (2023 paper)  
 ✅ **GEO Context** - Hot topic in AI search optimization  
+✅ **Evidence-Based Validation** - Zero hallucination tolerance  
 
 **Confidence:** 95% - This approach is research-backed.
+
+---
+
+## Quality Metrics
+
+The tool tracks and reports on:
+
+**Content Quality:**
+- Readability score (Flesch Reading Ease)
+- Technical density
+- Average sentence/word length
+- Total characters and words
+
+**Query Quality:**
+- Average specificity score
+- Average realism score
+- Generic query count (target: 0)
+- Domain term usage
+
+**Evidence Quality:**
+- Exact quote accuracy (target: 100%)
+- Hallucination rate (target: 0%)
+- Average confidence score
+- Average evidence length
+
+**Assessment Quality:**
+- Overclaim rate (false positives)
+- Underclaim rate (false negatives)
+- Accurate assessment rate
 
 ---
 
@@ -263,4 +307,4 @@ https://github.com/houtiniai
 
 ---
 
-**Status:** ✅ MVP Complete - Ready for Testing
+**Status:** ✅ MVP Complete - Visual Dashboard Integrated

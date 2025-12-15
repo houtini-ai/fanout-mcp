@@ -32,25 +32,46 @@ export async function analyzeContentGap(
   const formatter = new ReportFormatter();
 
   try {
-    const content = await fetcher.fetchContent(url);
+    const startTime = Date.now();
 
+    const fetchStart = Date.now();
+    const content = await fetcher.fetchContent(url);
+    const fetchTime = Date.now() - fetchStart;
+
+    const queryStart = Date.now();
     const queryGraph = await decomposer.decomposeQueries(
       content,
       depth as AnalysisDepth,
       focus_area
     );
+    const queryTime = Date.now() - queryStart;
 
+    const assessStart = Date.now();
     const assessments = await assessor.assessCoverage(content, queryGraph);
+    const assessTime = Date.now() - assessStart;
 
-    const report = formatter.formatReport(content, queryGraph, assessments);
+    const totalTime = Date.now() - startTime;
 
-    // Add instruction for Claude to create an artifact
+    const report = formatter.formatReport(content, queryGraph, assessments, {
+      fetchTime,
+      queryTime,
+      assessTime,
+      totalTime
+    });
+
     const instructionPrefix = `[INSTRUCTION TO CLAUDE: Please create an interactive HTML artifact to visualize this content gap analysis. The artifact should include:
-- A header with the URL, title, and coverage score
-- Color-coded sections for prerequisite/core/follow-up queries
+- A header with the URL, title, and coverage score with a gradient progress bar
+- Color-coded sections for prerequisite/core/follow-up queries (blue/purple/orange)
 - Expandable query cards showing coverage status, evidence, and recommendations
 - A summary section with prioritized action items
-- Make it visually appealing with good UX]
+- A collapsible "Technical Analysis" section at the bottom showing:
+  * Content metrics (characters, words, readability, technical density)
+  * Query decomposition metrics (model, distribution, quality scores)
+  * Self-RAG validation metrics (evidence quality, hallucination rate, confidence)
+  * Processing metrics (timing breakdown, API calls, estimated cost)
+  * Content extraction quality scores
+- Use a modern shadcn-inspired design with subtle gradients, borders, and hover effects
+- Make it visually appealing with good UX and smooth transitions]
 
 ---
 
