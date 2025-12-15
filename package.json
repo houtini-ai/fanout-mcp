@@ -1,7 +1,7 @@
 {
   "name": "@houtini/fanout-mcp",
-  "version": "0.1.0",
-  "description": "Advanced content gap analysis using cutting-edge Information Retrieval techniques",
+  "version": "0.2.0",
+  "description": "Advanced content gap analysis using Query Decomposition, Keyword Fan-Out, and Self-RAG for Generative Engine Optimization (GEO)",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -14,14 +14,41 @@
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
     "content-analysis",
+    "content-gap-analysis",
     "seo",
     "geo",
+    "generative-engine-optimization",
     "query-generation",
-    "rag"
+    "query-decomposition",
+    "keyword-fanout",
+    "self-rag",
+    "rag",
+    "ai-search",
+    "claude",
+    "anthropic"
   ],
   "author": "Richard Baxter <richard@houtini.ai>",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/houtiniai/fanout-mcp.git"
+  },
+  "homepage": "https://github.com/houtiniai/fanout-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/houtiniai/fanout-mcp/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "research/keyword-fanout-explained.md",
+    "research/google-fanout-adaptation.md"
+  ],
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
     "@modelcontextprotocol/sdk": "latest",

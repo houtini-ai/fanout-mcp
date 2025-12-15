@@ -1,5 +1,11 @@
 # Fan-Out MCP
 
+[![npm version](https://img.shields.io/npm/v/@houtini/fanout-mcp.svg?style=flat-square)](https://www.npmjs.com/package/@houtini/fanout-mcp)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-green?style=flat-square)](https://modelcontextprotocol.io)
+[![Research Backed](https://img.shields.io/badge/Research-Backed-purple?style=flat-square)](research/keyword-fanout-explained.md)
+
 **Advanced content gap analysis for the AI search era**
 
 Analyze your content to discover what user queries it covers (and misses) using the same techniques AI search engines use internally.

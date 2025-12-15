@@ -1,0 +1,49 @@
+# Source files (only publish compiled dist/)
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+
+# Testing and documentation
+TESTING-REPORT.md
+TESTING-AND-DOCUMENTATION-HANDOVER.md
+TESTING-HANDOVER.md
+HANDOVER-TESTING-SESSION.md
+HANDOVER-SESSION-2.md
+SESSION-SUMMARY-2024-12-15.md
+SESSION-COMPLETE.md
+BUILD-COMPLETE.md
+BUILD_PROMPT.md
+IMPLEMENTATION-COMPLETE.md
+KEYWORD-FANOUT-IMPLEMENTATION.md
+commit-*.txt
+
+# Git files
+.git/
+.gitignore
+.github/
+
+# Development files
+node_modules/
+*.log
+npm-debug.log*
+.DS_Store
+.env
+.env.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts (except dist/)
+*.tsbuildinfo
+
+# Keep these
+!dist/
+!README.md
+!LICENSE
+!research/keyword-fanout-explained.md
+!research/google-fanout-adaptation.md

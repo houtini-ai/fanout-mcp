@@ -1,0 +1,20 @@
+chore: prepare for npm publishing
+
+- Clean up all internal development documentation
+- Remove testing reports and handover documents
+- Remove commit message helper files
+- Remove internal research documents (keep public-facing)
+- Add .npmignore for package publishing
+- Add badges to README
+- Update package.json to v0.2.0 with full metadata
+- Repository ready for GitHub and npm publication
+
+Files kept:
+- README.md (comprehensive documentation)
+- LICENSE (Apache 2.0)
+- research/keyword-fanout-explained.md (public explainer)
+- research/google-fanout-adaptation.md (technical docs)
+- research/README.md (research overview)
+- Source and build files
+
+Repository is now clean and ready for public release.
