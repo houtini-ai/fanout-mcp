@@ -289,7 +289,9 @@ The keyword fan-out methodology is based on Google's query expansion research:
 - [Training Query Fan-Out Models with Generative Neural Networks (arXiv:2210.12084)](https://arxiv.org/pdf/2210.12084)
 - Google Patent US 11663201 B2: Query variant generation
 
-See `research/google-fanout-adaptation.md` for detailed implementation notes, what we adopted from the research, and what we adapted for our use case.
+**Want to understand the research?** Read our accessible explainer: [`research/keyword-fanout-explained.md`](research/keyword-fanout-explained.md)
+
+For implementation details, see `research/google-fanout-adaptation.md`.
 
 **Key Adaptation:** We use Claude Sonnet 4.5 with prompt engineering instead of trained neural networks for flexibility and faster iteration whilst maintaining quality.
 
@@ -479,10 +481,14 @@ All research is in `/research`:
 
 | Document | Purpose |
 |----------|---------|
+| **keyword-fanout-explained.md** | **Accessible research explainer** - How Google's methodology works, our adaptation, and test learnings |
+| **google-fanout-adaptation.md** | Technical implementation details and design decisions |
 | **README.md** | Research summary and next steps |
 | **ir-research-findings.md** | Full Gemini deep research report |
 | **design-decisions.md** | Architecture decisions and answers |
 | **technical-implementation.md** | Detailed implementation plan |
+
+**Start here:** Read `keyword-fanout-explained.md` for an accessible introduction to the research and methodology.
 
 ---
 
