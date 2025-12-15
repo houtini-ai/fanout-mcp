@@ -44,7 +44,19 @@ export async function analyzeContentGap(
 
     const report = formatter.formatReport(content, queryGraph, assessments);
 
-    return report;
+    // Add instruction for Claude to create an artifact
+    const instructionPrefix = `[INSTRUCTION TO CLAUDE: Please create an interactive HTML artifact to visualize this content gap analysis. The artifact should include:
+- A header with the URL, title, and coverage score
+- Color-coded sections for prerequisite/core/follow-up queries
+- Expandable query cards showing coverage status, evidence, and recommendations
+- A summary section with prioritized action items
+- Make it visually appealing with good UX]
+
+---
+
+`;
+
+    return instructionPrefix + report;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Content gap analysis failed: ${error.message}`);
