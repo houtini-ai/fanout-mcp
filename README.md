@@ -434,6 +434,29 @@ The tool tracks and reports on:
 
 ---
 
+## Design System
+
+This MCP uses components inspired by the [Claude Visual Style Guide](https://github.com/jcmrs/claude-visual-style-guide) for consistent, accessible artifact rendering. Components are defined inline using semantic color tokens (`bg-background`, `text-foreground`, `bg-card`, `border-border`) compatible with both light and dark modes.
+
+**Key Components:**
+- **Button** - Variants: default, secondary, outline, ghost
+- **Card** - Card / CardHeader / CardTitle / CardContent
+- **Badge** - Status colors: success (green), warning (yellow), error (red)
+- **Progress** - Animated progress bar
+- **Collapsible** - Expandable sections with icons
+
+All components use Tailwind CSS utility classes and Lucide icons via `window.lucide`. The visual style guide ensures:
+- Consistent design language across all artifacts
+- Semantic HTML and proper accessibility
+- Dark mode compatibility out of the box
+- Familiar shadcn/ui-inspired patterns
+
+**Why Inline Components?**
+
+Claude artifacts run in a sandboxed environment without npm dependencies. Components are defined at the top of each artifact using the templates in `buildInstructionPrefix()`, ensuring consistency without requiring external imports.
+
+---
+
 ## License
 
 Apache License 2.0

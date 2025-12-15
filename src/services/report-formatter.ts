@@ -489,12 +489,18 @@ export class ReportFormatter {
     return lines.join("\n");
   }
 
-  private calculateAvgSpecificity(queryGraph: QueryGraph): number {
+  private calculateAvgSpecificity(queryGraph: QueryGraph | EnhancedQueryGraph): number {
     const allQueries = [
       ...queryGraph.prerequisite,
       ...queryGraph.core,
       ...queryGraph.followup
     ];
+
+    if ('fanOutVariants' in queryGraph && queryGraph.fanOutVariants) {
+      Object.values(queryGraph.fanOutVariants).forEach(variants => {
+        if (variants) allQueries.push(...variants);
+      });
+    }
 
     if (allQueries.length === 0) return 0;
 
@@ -518,12 +524,18 @@ export class ReportFormatter {
     return Math.round((specificityScores.reduce((a, b) => a + b, 0) / allQueries.length) * 100) / 100;
   }
 
-  private calculateAvgRealism(queryGraph: QueryGraph): number {
+  private calculateAvgRealism(queryGraph: QueryGraph | EnhancedQueryGraph): number {
     const allQueries = [
       ...queryGraph.prerequisite,
       ...queryGraph.core,
       ...queryGraph.followup
     ];
+
+    if ('fanOutVariants' in queryGraph && queryGraph.fanOutVariants) {
+      Object.values(queryGraph.fanOutVariants).forEach(variants => {
+        if (variants) allQueries.push(...variants);
+      });
+    }
 
     if (allQueries.length === 0) return 0;
 
@@ -544,12 +556,18 @@ export class ReportFormatter {
     return Math.round((realismScores.reduce((a, b) => a + b, 0) / allQueries.length) * 100) / 100;
   }
 
-  private countGenericQueries(queryGraph: QueryGraph): number {
+  private countGenericQueries(queryGraph: QueryGraph | EnhancedQueryGraph): number {
     const allQueries = [
       ...queryGraph.prerequisite,
       ...queryGraph.core,
       ...queryGraph.followup
     ];
+
+    if ('fanOutVariants' in queryGraph && queryGraph.fanOutVariants) {
+      Object.values(queryGraph.fanOutVariants).forEach(variants => {
+        if (variants) allQueries.push(...variants);
+      });
+    }
 
     return allQueries.filter(q => {
       const query = q.query.toLowerCase();
@@ -568,12 +586,18 @@ export class ReportFormatter {
     }).length;
   }
 
-  private calculateDomainTermUsage(queryGraph: QueryGraph, content: ContentData): number {
+  private calculateDomainTermUsage(queryGraph: QueryGraph | EnhancedQueryGraph, content: ContentData): number {
     const allQueries = [
       ...queryGraph.prerequisite,
       ...queryGraph.core,
       ...queryGraph.followup
     ];
+
+    if ('fanOutVariants' in queryGraph && queryGraph.fanOutVariants) {
+      Object.values(queryGraph.fanOutVariants).forEach(variants => {
+        if (variants) allQueries.push(...variants);
+      });
+    }
 
     if (allQueries.length === 0) return 0;
 

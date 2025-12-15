@@ -1,0 +1,5 @@
+fix: include fan-out variants in quality metrics
+
+Updated calculateAvgSpecificity, calculateAvgRealism, countGenericQueries,
+and calculateDomainTermUsage to process fan-out variants alongside content
+queries. Fixes issue where metrics showed 0 in keyword-only mode.

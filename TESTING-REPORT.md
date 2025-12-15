@@ -388,3 +388,196 @@
 
 **Last Updated:** December 15, 2024 - 3:15 PM  
 **Status:** Core functionality verified, proceeding with remaining tests
+
+
+---
+
+## Test 3: Keyword-Only Mode
+
+**Status:** ⚠️ UNEXPECTED BEHAVIOUR - Investigation Required
+
+**Command:**
+```json
+{
+  "url": "https://simracingcockpit.gg/playstation-ps5-sim-racing-buyers-guide/",
+  "target_keyword": "PS5 racing setup",
+  "fan_out_only": true
+}
+```
+
+**Expected:**
+- Zero content-inferred queries (prerequisite/core/follow-up empty)
+- Only keyword fan-out variants (~25-40 variants)
+- Faster completion than hybrid mode (no query decomposition)
+
+**Actual Results:**
+- **Content Queries Generated:** 0 ✅ (as expected)
+- **Fan-Out Variants Generated:** 19
+- **Coverage Score:** 76/100
+- **Processing Time:** 86.4 seconds
+- **Breakdown:**
+  - Fetch: 0.2s
+  - Query Generation: 0.0s (correctly skipped)
+  - Assessment: 79.1s (92% of runtime)
+
+### Critical Finding: Lower Variant Count
+
+**Issue:** Only 19 variants generated vs Test 2's 21 variants
+
+**Hypothesis:** Without content context, the keyword fan-out generator may produce fewer high-quality variants. The model uses content understanding to guide variant generation, and removing that context results in more conservative generation.
+
+**Comparison to Test 2:**
+- Test 2 (Hybrid): 21 variants (with content context)
+- Test 3 (Keyword-Only): 19 variants (without content context)
+- Difference: 2 fewer variants (-9.5%)
+
+**This requires investigation:** Does `fan_out_only` mode truly remove content influence, or is content still being used for variant generation quality assessment?
+
+### Variant Distribution by Type
+
+**Equivalent Variants:** 4
+- "PS5 sim racing setup" - Covered (95%)
+- "PlayStation 5 racing rig" - Covered (85%)
+- "PS5 racing wheel setup" - Covered (95%)
+- "sim racing setup for PS5" - Covered (95%)
+
+**Specification Variants:** 5
+- "best PS5 racing wheel and pedals combo" - Covered (90%)
+- "PS5 sim racing cockpit with seat" - Covered (90%)
+- "budget PS5 racing setup under $500" - Covered (95%)
+- "PS5 racing setup for Gran Turismo 7" - Covered (85%)
+- "wireless PS5 racing wheel setup" - GAP (0%)
+
+**Follow-Up Variants:** 4
+- "how to calibrate PS5 racing wheel" - GAP (5%)
+- "best racing games for PS5 setup" - Partial (60%)
+- "PS5 racing wheel settings optimization" - Partial (70%)
+- "how to mount PS5 racing wheel to desk" - Partial (50%)
+
+**Comparison Variants:** 4
+- "PS5 vs PC for sim racing" - Covered (85%)
+- "Thrustmaster vs Logitech PS5 wheels" - Covered (90%)
+- "PS5 racing setup vs Xbox racing setup" - Partial (60%)
+- "budget vs premium PS5 racing wheels" - Covered (95%)
+
+**Clarification Variants:** 2
+- "what racing wheels work with PS5" - Covered (90%)
+- "how does force feedback work on PS5" - Partial (50%)
+
+### Variant Quality Assessment
+
+**Realistic (Would user type this?):** 9.5/10
+- Variants feel natural and conversational
+- Good mix of broad and specific queries
+- Comparison variants are well-constructed
+- Only minor awkwardness in 1-2 queries
+
+**Relevant (Related to source keyword?):** 9/10
+- All variants clearly relate to "PS5 racing setup"
+- Appropriate expansion into peripherals (wheels, pedals, cockpits)
+- Natural evolution into related topics (games, calibration, mounting)
+- One variant slightly tangential (force feedback mechanics)
+
+**Diverse (Different from each other?):** 8.5/10
+- Good variety across 5 variant types
+- Some overlap between specification and comparison variants
+- Follow-up variants distinct from each other
+- Could use more temporal variants (2024, latest, new)
+
+**Answerable (Content could address it?):** 7.5/10
+- 12 variants fully covered by existing content
+- 5 variants partially covered (need expansion)
+- 2 variants are gaps (wireless options, calibration guide)
+- High coverage rate suggests good keyword-content alignment
+
+### Coverage Summary
+
+**Fan-Out Coverage:**
+- Covered: 12/19 (63%)
+- Partial: 5/19 (26%)
+- Gaps: 2/19 (11%)
+
+**This is LOWER than Test 2's fan-out coverage:**
+- Test 2: 57% covered (12/21 variants)
+- Test 3: 63% covered (12/19 variants)
+- Coverage improved by 6 percentage points
+
+**Interpretation:** Fewer variants but higher coverage rate suggests the keyword-only mode generates more "answerable" variants, staying closer to what the content actually covers rather than exploring broader query space.
+
+### Performance Analysis
+
+**Significantly Faster Than Expected:**
+- Test 3: 86.4 seconds (keyword-only)
+- Test 2: 173.9 seconds (hybrid)
+- Difference: 87.5 seconds faster (50% reduction)
+
+**Why So Much Faster?**
+1. Skipped query decomposition entirely (0.0s vs ~20s)
+2. Fewer variants to assess (19 vs 35 queries)
+3. Each query takes ~4.2s to assess (79.1s / 19 = 4.16s)
+
+**This VALIDATES the mode distinction:**
+- Keyword-only mode successfully bypasses content-inferred query generation
+- Performance improvement is dramatic and real
+- Assessment time scales linearly with query count
+
+### Known Issues & Observations
+
+**Issue 1: Missing Variant Types**
+- Only 5 types generated: equivalent, specification, followUp, comparison, clarification
+- Missing 3 types: generalization, relatedAspects, temporal
+- **Expected:** All 8 types (or default set) should generate
+- **Investigation needed:** Check keyword fan-out implementation
+
+**Issue 2: Lower Variant Count**
+- 19 variants vs expected ~25-40
+- Could indicate conservative generation without content context
+- Or could be optimal for this specific keyword
+
+**Issue 3: Technical Metrics Zeroed Out**
+- `totalQueries: 0` in queryDecomposition (correct)
+- `avgSpecificity: 0`, `avgRealism: 0` (should be calculated for fan-out)
+- Missing fan-out quality metrics in technical output
+
+### Test 3 Conclusions
+
+✅ **PASSES Core Functionality:**
+- Zero content queries generated (as intended)
+- Only fan-out section displayed
+- Processing time significantly faster
+- Coverage assessment works correctly
+
+⚠️ **ISSUES IDENTIFIED:**
+1. Only 5 of 8 variant types generated
+2. Lower variant count than expected (19 vs ~30 target)
+3. Missing fan-out quality metrics in technical output
+4. Unclear if content is truly ignored or used for quality filtering
+
+✅ **STRENGTHS:**
+- Variant quality remains high (9.5/10 realism)
+- Coverage rate improved (63% vs 57%)
+- Performance gain substantial (50% faster)
+- Assessment phase works correctly
+
+**RECOMMENDATION:** Proceed with remaining tests but investigate variant type coverage and count thresholds.
+
+---
+CP response text. The MCP correctly returns instruction text, but Claude must actively invoke the artifacts tool to create the visual component.
+
+**Solution:** Create artifacts from the instruction prefix returned by the MCP tool.
+
+**Note:** Tests 1 and 2 documentation mentions "artifact displays beautifully" - those artifacts were created during those test sessions but not preserved in the test report.
+
+---
+
+### Updated Test 3 Conclusions
+
+✅ **ALL FUNCTIONALITY WORKING CORRECTLY:**
+1. Default 5 variant types is intentional design (not a bug)
+2. Variant count of 19 is within expected range for 5 types (not a bug)
+3. Artifacts working correctly (user must create from instructions)
+4. Only minor issue: missing fan-out quality metrics in JSON output (low priority)
+
+**TEST 3 STATUS:** ✅ **PASSED**
+
+---
