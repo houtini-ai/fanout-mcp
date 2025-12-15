@@ -1,6 +1,6 @@
 {
   "name": "@houtini/fanout-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Advanced content gap analysis using Query Decomposition, Keyword Fan-Out, and Self-RAG for Generative Engine Optimization (GEO)",
   "type": "module",
   "main": "dist/index.js",
@@ -33,11 +33,11 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/houtiniai/fanout-mcp.git"
+    "url": "git+https://github.com/houtini-ai/fanout-mcp.git"
   },
-  "homepage": "https://github.com/houtiniai/fanout-mcp#readme",
+  "homepage": "https://houtini.com",
   "bugs": {
-    "url": "https://github.com/houtiniai/fanout-mcp/issues"
+    "url": "https://github.com/houtini-ai/fanout-mcp/issues"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -73,29 +73,21 @@ Plus detailed markdown report with all data.
 ## Installation
 
 ### Prerequisites
-- Node.js 18+
 - Claude Desktop (or any MCP-compatible client)
 - Anthropic API key
+- Node.js 18+ (for local build only)
 
-### Setup
+### Quick Setup (Recommended)
 
-1. **Clone and build:**
-```bash
-git clone https://github.com/houtiniai/fanout-mcp.git
-cd fanout-mcp
-npm install
-npm run build
-```
+**The fastest way to get started** - no cloning or building required:
 
-2. **Configure Claude Desktop:**
-
-Add to `claude_desktop_config.json`:
+1. **Add to `claude_desktop_config.json`:**
 ```json
 {
   "mcpServers": {
     "fanout": {
-      "command": "node",
-      "args": ["/absolute/path/to/fanout-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@houtini/fanout-mcp@latest"],
       "env": {
         "ANTHROPIC_API_KEY": "sk-ant-api03-your-key-here"
       }
@@ -197,7 +189,7 @@ This tool implements techniques from cutting-edge Information Retrieval research
 **Query Decomposition** - Least-to-Most prompting breaks complex topics into prerequisite, core, and follow-up queries.
 
 **Want to understand the research?** 📖 Read our accessible explainer:
-### **[Understanding Keyword Fan-Out: The Research Explained](research/keyword-fanout-explained.md)**
+### **[Understanding Keyword Fan-Out: The Research Explained](https://github.com/houtini-ai/fanout-mcp/blob/main/research/keyword-fanout-explained.md)**
 
 This document explains:
 - Why query fan-out matters for content optimization
@@ -206,7 +198,7 @@ This document explains:
 - Real examples from testing
 - When to use which variant types
 
-For implementation details, see [`research/google-fanout-adaptation.md`](research/google-fanout-adaptation.md).
+For implementation details, see [`research/google-fanout-adaptation.md`](https://github.com/houtini-ai/fanout-mcp/blob/main/research/google-fanout-adaptation.md).
 
 ---
 
@@ -615,7 +607,7 @@ For commercial licensing enquiries, please visit https://houtini.com
 
 **Richard Baxter**  
 Houtini.ai  
-GitHub: https://github.com/houtiniai
+GitHub: https://github.com/houtini-ai
 
 **Questions?** Open an issue on GitHub  
 **Commercial enquiries:** https://houtini.com
