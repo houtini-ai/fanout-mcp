@@ -1,15 +1,18 @@
 import {
   AnalysisReport,
   QueryGraph,
+  EnhancedQueryGraph,
   CoverageAssessment,
   ContentData,
   TechnicalMetrics,
+  FanOutQuery,
+  FanOutVariantType,
 } from "../types.js";
 
 export class ReportFormatter {
   formatReport(
     content: ContentData,
-    queryGraph: QueryGraph,
+    queryGraph: QueryGraph | EnhancedQueryGraph,
     assessments: CoverageAssessment[],
     timings?: {
       fetchTime: number;
@@ -19,12 +22,16 @@ export class ReportFormatter {
     }
   ): string {
     const report = this.buildReport(content, queryGraph, assessments, timings);
-    return this.generateMarkdown(report);
+    return this.generateMarkdown(report, this.isEnhancedGraph(queryGraph) ? queryGraph : undefined);
+  }
+
+  private isEnhancedGraph(queryGraph: QueryGraph | EnhancedQueryGraph): queryGraph is EnhancedQueryGraph {
+    return 'fanOutVariants' in queryGraph || 'targetKeyword' in queryGraph;
   }
 
   private buildReport(
     content: ContentData,
-    queryGraph: QueryGraph,
+    queryGraph: QueryGraph | EnhancedQueryGraph,
     assessments: CoverageAssessment[],
     timings?: {
       fetchTime: number;
@@ -96,9 +103,27 @@ export class ReportFormatter {
     return { high, medium };
   }
 
+  private estimateCost(content: ContentData, totalQueries: number): string {
+    const inputTokens = 
+      (content.markdown.length / 4) +
+      (500) +
+      (totalQueries * 200) +
+      (totalQueries * 50);
+    
+    const outputTokens = 
+      (totalQueries * 30) +
+      (totalQueries * 200);
+    
+    const inputCost = (inputTokens / 1_000_000) * 3;
+    const outputCost = (outputTokens / 1_000_000) * 15;
+    const totalCost = inputCost + outputCost;
+    
+    return `$${totalCost.toFixed(2)}`;
+  }
+
   private calculateTechnicalMetrics(
     content: ContentData,
-    queryGraph: QueryGraph,
+    queryGraph: QueryGraph | EnhancedQueryGraph,
     assessments: CoverageAssessment[],
     timings?: {
       fetchTime: number;
@@ -159,10 +184,10 @@ export class ReportFormatter {
           }
         },
         queryQualityMetrics: {
-          avgSpecificity: 0.87,
-          avgRealism: 0.92,
-          genericQueryCount: 0,
-          domainTermUsage: 0.73,
+          avgSpecificity: this.calculateAvgSpecificity(queryGraph),
+          avgRealism: this.calculateAvgRealism(queryGraph),
+          genericQueryCount: this.countGenericQueries(queryGraph),
+          domainTermUsage: this.calculateDomainTermUsage(queryGraph, content),
         }
       },
       selfRAG: {
@@ -189,9 +214,9 @@ export class ReportFormatter {
           avgConfidenceScore: Math.round(avgConfidence * 10) / 10,
         },
         assessmentQuality: {
-          overclaimRate: 0.0,
-          underclaimRate: 0.07,
-          accurateAssessmentRate: 0.93,
+          overclaimRate: this.calculateOverclaimRate(assessments),
+          underclaimRate: this.calculateUnderclaimRate(assessments),
+          accurateAssessmentRate: 1 - (this.calculateOverclaimRate(assessments) + this.calculateUnderclaimRate(assessments)),
         }
       },
       processingMetrics: {
@@ -199,11 +224,11 @@ export class ReportFormatter {
         contentFetchTime: timings ? `${(timings.fetchTime / 1000).toFixed(1)}s` : "N/A",
         queryGenerationTime: timings ? `${(timings.queryTime / 1000).toFixed(1)}s` : "N/A",
         assessmentTime: timings ? `${(timings.assessTime / 1000).toFixed(1)}s` : "N/A",
-        apiCalls: 2,
-        estimatedCost: "$0.14",
+        apiCalls: 1 + Math.ceil(totalQueries / 5),
+        estimatedCost: this.estimateCost(content, totalQueries),
       },
       contentExtraction: {
-        method: "cheerio + turndown",
+        method: "cheerio (HTML cleaning)",
         mainContentFound: true,
         extractionQuality: 0.94,
         noiseFilteringScore: 0.89,
@@ -212,14 +237,23 @@ export class ReportFormatter {
     };
   }
 
-  private generateMarkdown(report: AnalysisReport): string {
+  private generateMarkdown(report: AnalysisReport, enhancedGraph?: EnhancedQueryGraph): string {
     const sections: string[] = [];
 
     sections.push(`## Query Coverage Analysis\n`);
     sections.push(`**URL:** ${report.url}`);
     sections.push(`**Title:** ${report.title}`);
     sections.push(`**Coverage Score:** ${report.coverageScore}/100`);
-    sections.push(`**Analysis Date:** ${report.analysisDate}\n`);
+    sections.push(`**Analysis Date:** ${report.analysisDate}`);
+    
+    if (enhancedGraph?.targetKeyword) {
+      const mode = enhancedGraph.fanOutVariants && Object.keys(enhancedGraph.fanOutVariants).length > 0
+        ? "hybrid"
+        : "content-only";
+      sections.push(`**Analysis Mode:** ${mode} (keyword: "${enhancedGraph.targetKeyword}")\n`);
+    } else {
+      sections.push("");
+    }
 
     sections.push(`### Query Graph Breakdown\n`);
 
@@ -240,6 +274,14 @@ export class ReportFormatter {
       report.queryGraph.followup,
       report.assessments
     ));
+
+    if (enhancedGraph?.fanOutVariants && Object.keys(enhancedGraph.fanOutVariants).length > 0) {
+      sections.push(this.formatFanOutSection(
+        enhancedGraph.fanOutVariants,
+        enhancedGraph.targetKeyword || "keyword",
+        report.assessments
+      ));
+    }
 
     sections.push(`### Summary Recommendations\n`);
 
@@ -286,6 +328,115 @@ export class ReportFormatter {
     }
 
     return sections.join("\n");
+  }
+
+  private formatFanOutSection(
+    fanOutVariants: Record<string, FanOutQuery[]>,
+    targetKeyword: string,
+    assessments: CoverageAssessment[]
+  ): string {
+    const lines: string[] = [];
+    
+    lines.push(`\n### Keyword Fan-Out Analysis\n`);
+    lines.push(`**Source Keyword:** "${targetKeyword}"\n`);
+
+    const variantTypeDescriptions: Record<FanOutVariantType, string> = {
+      equivalent: "Alternative phrasings with same meaning",
+      specification: "More detailed/specific versions",
+      generalization: "Broader/higher-level queries",
+      followUp: "Natural next questions users would ask",
+      comparison: "Comparison and alternative queries",
+      clarification: "Questions seeking to clarify concepts",
+      relatedAspects: "Related topics and adjacent queries",
+      temporal: "Time-sensitive variants (dates, seasons, trends)"
+    };
+
+    const variantTypeOrder: FanOutVariantType[] = [
+      "equivalent",
+      "specification",
+      "generalization",
+      "followUp",
+      "comparison",
+      "clarification",
+      "relatedAspects",
+      "temporal"
+    ];
+
+    let totalVariants = 0;
+    let coveredVariants = 0;
+
+    for (const variantType of variantTypeOrder) {
+      const variants = fanOutVariants[variantType];
+      if (!variants || variants.length === 0) continue;
+
+      lines.push(`#### ${this.formatVariantTypeName(variantType)}`);
+      lines.push(`*${variantTypeDescriptions[variantType]}*\n`);
+
+      variants.forEach((variant) => {
+        totalVariants++;
+        const assessment = assessments.find((a) => a.query === variant.query);
+        if (!assessment) return;
+
+        if (assessment.status === "covered") coveredVariants++;
+
+        const statusIcon =
+          assessment.status === "covered"
+            ? "✅"
+            : assessment.status === "partial"
+            ? "⚠️"
+            : "❌";
+        const statusText =
+          assessment.status === "covered"
+            ? "COVERED"
+            : assessment.status === "partial"
+            ? "PARTIAL"
+            : "GAP";
+
+        lines.push(
+          `${statusIcon} "${variant.query}" - **${statusText}** (${assessment.confidence}% confidence)`
+        );
+
+        if (assessment.evidence) {
+          lines.push(`   Evidence: "${assessment.evidence}"`);
+          if (assessment.evidence_location) {
+            lines.push(`   Location: ${assessment.evidence_location}`);
+          }
+        }
+
+        if (assessment.gap_description) {
+          lines.push(`   Gap: ${assessment.gap_description}`);
+        }
+
+        if (assessment.recommendation) {
+          lines.push(`   Recommendation: ${assessment.recommendation}`);
+        }
+
+        lines.push("");
+      });
+
+      lines.push("");
+    }
+
+    lines.push(`**Fan-Out Coverage Summary:**`);
+    lines.push(`- Total Variants Generated: ${totalVariants}`);
+    lines.push(`- Covered: ${coveredVariants} (${Math.round((coveredVariants / totalVariants) * 100)}%)`);
+    lines.push(`- Gaps: ${totalVariants - coveredVariants} (${Math.round(((totalVariants - coveredVariants) / totalVariants) * 100)}%)\n`);
+
+    return lines.join("\n");
+  }
+
+  private formatVariantTypeName(type: FanOutVariantType): string {
+    const names: Record<FanOutVariantType, string> = {
+      equivalent: "Equivalent Variants",
+      specification: "Specification Variants",
+      generalization: "Generalization Variants",
+      followUp: "Follow-Up Variants",
+      comparison: "Comparison Variants",
+      clarification: "Clarification Variants",
+      relatedAspects: "Related Aspects",
+      temporal: "Temporal Variants"
+    };
+    return names[type] || type;
   }
 
   private formatQuerySection(
@@ -336,5 +487,159 @@ export class ReportFormatter {
     });
 
     return lines.join("\n");
+  }
+
+  private calculateAvgSpecificity(queryGraph: QueryGraph): number {
+    const allQueries = [
+      ...queryGraph.prerequisite,
+      ...queryGraph.core,
+      ...queryGraph.followup
+    ];
+
+    if (allQueries.length === 0) return 0;
+
+    const specificityScores = allQueries.map(q => {
+      const query = q.query.toLowerCase();
+      let score = 0;
+
+      if (/\d+/.test(query)) score += 0.3;
+      if (/\b[A-Z][a-z]+\b/.test(q.query)) score += 0.25;
+      if (/\b(vs|versus|compared to|difference between)\b/.test(query)) score += 0.2;
+
+      const wordCount = query.split(/\s+/).length;
+      if (wordCount >= 8) score += 0.15;
+      else if (wordCount >= 5) score += 0.1;
+
+      if (/\b\w+-\w+\b/.test(query)) score += 0.1;
+
+      return Math.min(1, score);
+    });
+
+    return Math.round((specificityScores.reduce((a, b) => a + b, 0) / allQueries.length) * 100) / 100;
+  }
+
+  private calculateAvgRealism(queryGraph: QueryGraph): number {
+    const allQueries = [
+      ...queryGraph.prerequisite,
+      ...queryGraph.core,
+      ...queryGraph.followup
+    ];
+
+    if (allQueries.length === 0) return 0;
+
+    const realismScores = allQueries.map(q => {
+      const query = q.query.toLowerCase();
+      let score = 0.5;
+
+      if (/^(what|how|why|when|where|which|who|can|do|does|is|are)\b/.test(query)) score += 0.2;
+      if (/\b(best|good|better|should|need|want|looking for|help)\b/.test(query)) score += 0.15;
+      if (!/\b(utilize|commence|aforementioned|thereof)\b/.test(query)) score += 0.1;
+
+      const wordCount = query.split(/\s+/).length;
+      if (wordCount >= 5 && wordCount <= 15) score += 0.05;
+
+      return Math.min(1, score);
+    });
+
+    return Math.round((realismScores.reduce((a, b) => a + b, 0) / allQueries.length) * 100) / 100;
+  }
+
+  private countGenericQueries(queryGraph: QueryGraph): number {
+    const allQueries = [
+      ...queryGraph.prerequisite,
+      ...queryGraph.core,
+      ...queryGraph.followup
+    ];
+
+    return allQueries.filter(q => {
+      const query = q.query.toLowerCase();
+
+      const isGeneric = 
+        /^what is\b/.test(query) && query.split(/\s+/).length <= 4 ||
+        /^how to\b/.test(query) && query.split(/\s+/).length <= 4 ||
+        /^why (is|are|do|does)\b/.test(query) && query.split(/\s+/).length <= 5;
+
+      const hasNoSpecifics = 
+        !/\d+/.test(query) &&
+        !/\b[A-Z][a-z]+\b/.test(q.query) &&
+        !/\b\w+-\w+\b/.test(query);
+
+      return isGeneric && hasNoSpecifics;
+    }).length;
+  }
+
+  private calculateDomainTermUsage(queryGraph: QueryGraph, content: ContentData): number {
+    const allQueries = [
+      ...queryGraph.prerequisite,
+      ...queryGraph.core,
+      ...queryGraph.followup
+    ];
+
+    if (allQueries.length === 0) return 0;
+
+    const contentText = content.markdown.toLowerCase();
+    const domainTerms = new Set<string>();
+    
+    const hyphenated = content.markdown.match(/\b\w+-\w+\b/g) || [];
+    hyphenated.forEach(term => domainTerms.add(term.toLowerCase()));
+    
+    const properNouns = content.markdown.match(/\b[A-Z][a-z]+\b/g) || [];
+    properNouns.forEach(term => domainTerms.add(term.toLowerCase()));
+    
+    const acronyms = content.markdown.match(/\b[A-Z]{2,}\b/g) || [];
+    acronyms.forEach(term => domainTerms.add(term.toLowerCase()));
+
+    let termUsageCount = 0;
+    let totalWords = 0;
+
+    allQueries.forEach(q => {
+      const queryWords = q.query.toLowerCase().split(/\s+/);
+      totalWords += queryWords.length;
+      
+      queryWords.forEach(word => {
+        if (domainTerms.has(word)) {
+          termUsageCount++;
+        }
+      });
+    });
+
+    return totalWords > 0 
+      ? Math.round((termUsageCount / totalWords) * 100) / 100 
+      : 0;
+  }
+
+  private calculateOverclaimRate(assessments: CoverageAssessment[]): number {
+    if (assessments.length === 0) return 0;
+
+    const suspiciousCovers = assessments.filter(a => {
+      if (a.status !== "covered") return false;
+
+      const shortEvidence = a.evidence && a.evidence.length < 50;
+      const highConfidenceShortEvidence = a.confidence >= 95 && shortEvidence;
+      const noEvidence = !a.evidence;
+
+      return highConfidenceShortEvidence || noEvidence;
+    });
+
+    return Math.round((suspiciousCovers.length / assessments.length) * 100) / 100;
+  }
+
+  private calculateUnderclaimRate(assessments: CoverageAssessment[]): number {
+    if (assessments.length === 0) return 0;
+
+    const possibleUnderclaims = assessments.filter(a => {
+      const partialWithLongEvidence = 
+        a.status === "partial" && 
+        a.evidence && 
+        a.evidence.length > 150;
+
+      const gapWithEvidence = 
+        a.status === "gap" && 
+        a.evidence;
+
+      return partialWithLongEvidence || gapWithEvidence;
+    });
+
+    return Math.round((possibleUnderclaims.length / assessments.length) * 100) / 100;
   }
 }

@@ -257,7 +257,29 @@ function countVariantsByType(
 }
 
 function buildInstructionPrefix(isHybridMode: boolean): string {
-  const baseInstruction = `[INSTRUCTION TO CLAUDE: Please create an interactive HTML artifact to visualize this content gap analysis.`;
+  const componentTemplates = `
+VISUAL STYLE GUIDE COMPONENTS (Define at top):
+
+\`\`\`javascript
+const { ChevronDown, ChevronUp, CheckCircle, AlertCircle, XCircle, Zap } = window.lucide || {};
+const Button = ({ children, variant = 'default', className = '', ...props }) => {
+  const variants = { default: 'bg-primary text-primary-foreground hover:bg-primary/90', outline: 'border border-input bg-background hover:bg-accent' };
+  return <button className={\`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors \${variants[variant]} \${className}\`} {...props}>{children}</button>;
+};
+const Card = ({ children, className = '' }) => <div className={\`rounded-lg border border-border bg-card shadow-sm \${className}\`}>{children}</div>;
+const Badge = ({ children, variant = 'default' }) => {
+  const variants = { success: 'bg-green-100 text-green-800', warning: 'bg-yellow-100 text-yellow-800', error: 'bg-red-100 text-red-800' };
+  return <span className={\`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold \${variants[variant]}\`}>{children}</span>;
+};
+const Progress = ({ value }) => <div className="relative h-4 w-full rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: \`\${value}%\` }} /></div>;
+\`\`\`
+`;
+
+  const baseInstruction = `[INSTRUCTION TO CLAUDE: Create an interactive React artifact.
+
+${componentTemplates}
+
+`;
 
   if (isHybridMode) {
     return (
@@ -272,28 +294,17 @@ Display TWO main sections after the header:
 1. **Content-Inferred Queries** (standard 3-tier layout)
 2. **Keyword Fan-Out Analysis** (new section)
 
-For the Keyword Fan-Out section:
-- Show source keyword prominently
-- Display variants grouped by type (matching Google's taxonomy)
-- Use different color scheme from content queries (e.g., teal/cyan gradient)
-- Include variant type descriptions
-- Show coverage distribution by variant type
-- Add collapsible "About Fan-Out Method" section explaining Google's approach
+STRUCTURE:
+1. Header (gradient bg) - Title with Zap icon, URL, keyword Badge, Progress bar, stats
+2. Content Queries - Collapsible sections (blue/purple/orange), Card components with status icons
+3. Fan-Out Analysis - Keyword Badge header, variant sections (teal/cyan), coverage summary
+4. About Fan-Out (Collapsible) - Link to https://arxiv.org/pdf/2210.12084, explain 8 types
+5. Technical Analysis (Collapsible) - Grid layout, metrics
 
-Standard requirements:
-- Modern shadcn-inspired design
-- Color-coded sections (blue/purple/orange for tiers, teal/cyan for fan-out)
-- Expandable query cards
-- Technical analysis section at bottom
-- Mobile-responsive
+LAYOUT: min-h-screen bg-background p-6, max-w-6xl mx-auto, use Card components
+DATA: Show ALL queries, NO placeholder text like "+ 3 more items"
 
-Additional requirements for hybrid mode:
-- Clear visual separation between content vs keyword queries
-- Fan-out variant type legend/glossary
-- Coverage comparison: content queries vs keyword variants
-- Actionable recommendations specific to keyword optimization
-
-Make it visually appealing with good UX and smooth transitions]
+Make visually appealing with semantic HTML and accessibility.]
 
 ---
 
@@ -303,19 +314,16 @@ Make it visually appealing with good UX and smooth transitions]
 
   return (
     baseInstruction +
-    ` The artifact should include:
-- A header with the URL, title, and coverage score with a gradient progress bar
-- Color-coded sections for prerequisite/core/follow-up queries (blue/purple/orange)
-- Expandable query cards showing coverage status, evidence, and recommendations
-- A summary section with prioritized action items
-- A collapsible "Technical Analysis" section at the bottom showing:
-  * Content metrics (characters, words, readability, technical density)
-  * Query decomposition metrics (model, distribution, quality scores)
-  * Self-RAG validation metrics (evidence quality, hallucination rate, confidence)
-  * Processing metrics (timing breakdown, API calls, estimated cost)
-  * Content extraction quality scores
-- Use a modern shadcn-inspired design with subtle gradients, borders, and hover effects
-- Make it visually appealing with good UX and smooth transitions]
+    `STRUCTURE:
+1. Header (gradient) - Title, URL, Progress bar, stats
+2. Query Sections (Collapsible) - Prerequisite (blue), Core (purple), Follow-up (orange)
+3. Summary Recommendations - High/medium priority
+4. Technical Analysis (Collapsible) - Grid metrics, JSON display
+
+LAYOUT: min-h-screen bg-background p-6, max-w-5xl mx-auto
+DATA: Show ALL queries, NO placeholder text or truncation
+
+Make visually appealing with semantic HTML and accessibility.]
 
 ---
 

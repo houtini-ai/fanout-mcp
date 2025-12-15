@@ -4,6 +4,8 @@ import {
   QueryItem,
   CoverageAssessment,
   QueryGraph,
+  EnhancedQueryGraph,
+  FanOutQuery,
 } from "../types.js";
 import { createAssessmentPrompt } from "../prompts/assessment.js";
 
@@ -18,13 +20,23 @@ export class CoverageAssessor {
 
   async assessCoverage(
     content: ContentData,
-    queryGraph: QueryGraph
+    queryGraph: QueryGraph | EnhancedQueryGraph
   ): Promise<CoverageAssessment[]> {
     const allQueries = [
       ...queryGraph.prerequisite,
       ...queryGraph.core,
       ...queryGraph.followup,
     ];
+
+    // Add fan-out variants if present
+    if (this.isEnhancedGraph(queryGraph) && queryGraph.fanOutVariants) {
+      for (const variantType in queryGraph.fanOutVariants) {
+        const variants = queryGraph.fanOutVariants[variantType as keyof typeof queryGraph.fanOutVariants];
+        if (variants) {
+          allQueries.push(...variants);
+        }
+      }
+    }
 
     const assessments: CoverageAssessment[] = [];
 
@@ -37,6 +49,10 @@ export class CoverageAssessor {
     return assessments;
   }
 
+  private isEnhancedGraph(queryGraph: QueryGraph | EnhancedQueryGraph): queryGraph is EnhancedQueryGraph {
+    return 'fanOutVariants' in queryGraph || 'targetKeyword' in queryGraph;
+  }
+
   private async assessBatch(
     content: ContentData,
     queries: QueryItem[]
@@ -46,7 +62,7 @@ export class CoverageAssessor {
     try {
       const response = await this.client.messages.create({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 4000,
+        max_tokens: 8000,
         messages: [
           {
             role: "user",
@@ -62,23 +78,18 @@ export class CoverageAssessor {
 
       const text = content_block.text;
       
-      // Remove thinking tags if present
       const cleanText = text.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '').trim();
       
-      // Extract JSON array - try to find the most complete match
       const jsonMatch = cleanText.match(/\[\s*\{[\s\S]*\}\s*\]/);
 
       if (!jsonMatch) {
         throw new Error(`Failed to extract JSON from response. Response text: ${cleanText.substring(0, 500)}`);
       }
 
-      // Clean up common JSON issues
       let jsonStr = jsonMatch[0];
       
-      // Remove trailing commas before closing braces/brackets
       jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
-      
-      // Try to parse
+
       let assessments: CoverageAssessment[];
       try {
         assessments = JSON.parse(jsonStr);

@@ -10,18 +10,20 @@ export function createAssessmentPrompt(
 
   return `Act as an adversarial content critic using Self-RAG principles.
 
-CONTENT:
+CONTENT (Cleaned HTML with structure preserved):
 ${content.markdown}
 
 QUERIES TO ASSESS:
 ${queriesList}
 
 TASK:
-For EACH query, determine coverage with STRICT validation:
+For EACH query, determine coverage with STRICT validation.
+The content uses HTML structure - use tags like <p>, <h2>, <section> to help locate evidence.
 
 COVERED (100% confidence):
-- Quote EXACT sentence(s) that fully answer the query
+- Quote EXACT sentence(s) that fully answer the query (MAX 200 characters)
 - Evidence must be complete and unambiguous
+- If quote is longer than 200 chars, truncate and add "..."
 - Example: "The cost is $49/month" -> COVERED if this exact info exists
 
 PARTIAL (50-80% confidence):
@@ -50,7 +52,13 @@ CRITICAL JSON RULES:
 5. NO comments in the JSON
 6. Use double quotes for all strings
 7. Use null (not "null") for missing values
-8. Escape quotes inside strings with backslash
+8. ESCAPE ALL SPECIAL CHARACTERS in evidence strings:
+   - Backslash: \\ 
+   - Quote: \"
+   - Newline: \\n
+   - Tab: \\t
+9. If evidence is very long, truncate to 200 chars and add "..."
+10. Strip HTML tags from evidence quotes - extract plain text only
 
 Example valid response structure:
 <thinking>
@@ -62,8 +70,8 @@ Example valid response structure:
     "query": "exact query text here",
     "status": "covered",
     "confidence": 95,
-    "evidence": "exact quote from content",
-    "evidence_location": "section name or line reference",
+    "evidence": "exact quote from content (plain text, no HTML tags)",
+    "evidence_location": "section name or heading",
     "gap_description": null,
     "recommendation": "specific action if needed"
   },

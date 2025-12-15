@@ -1,26 +1,40 @@
 import fetch from "node-fetch";
 import * as cheerio from "cheerio";
-import TurndownService from "turndown";
 import { ContentData } from "../types.js";
 
-const turndownService = new TurndownService({
-  headingStyle: "atx",
-  codeBlockStyle: "fenced",
-  emDelimiter: "*",
-  strongDelimiter: "**",
-});
-
-turndownService.remove([
-  "script",
-  "style",
-  "nav",
-  "footer",
-  "header",
-  "aside",
-  "iframe",
-  "form",
-  "button",
-]);
+// Noise elements to remove entirely - similar to yubnub cleaner
+const NOISE_SELECTORS = [
+  'script',
+  'style',
+  'nav',
+  'header',
+  'footer',
+  'aside',
+  'iframe',
+  'form',
+  'button',
+  'noscript',
+  '.cookie-banner',
+  '.cookie-consent',
+  '.gdpr',
+  '[class*="cookie"]',
+  '[class*="consent"]',
+  '[id*="cookie"]',
+  '[role="navigation"]',
+  '[role="banner"]',
+  '[role="contentinfo"]',
+  '.social-share',
+  '.share-buttons',
+  '[class*="share"]',
+  '.sidebar',
+  '.comments',
+  '#comments',
+  '.advertisement',
+  '.ad-container',
+  '[class*="newsletter"]',
+  '[class*="subscribe"]',
+  '[class*="shortcode"]',
+];
 
 export class ContentFetcher {
   async fetchContent(url: string): Promise<ContentData> {
@@ -83,10 +97,12 @@ export class ContentFetcher {
   } | null {
     const $ = cheerio.load(html);
 
-    $("script, style, nav, footer, header, aside, iframe, form, button, .comments, .sidebar, #comments").remove();
+    // Remove noise elements (aggressive cleaning like yubnub)
+    NOISE_SELECTORS.forEach(selector => {
+      $(selector).remove();
+    });
 
-    $('[class*="shortcode"]').remove();
-
+    // Find semantic content container
     const articleSelectors = [
       "article",
       '[role="main"]',
@@ -115,22 +131,23 @@ export class ContentFetcher {
       $('meta[name="description"]').attr("content") ||
       $('meta[property="og:description"]').attr("content");
 
-    const articleHtml = $article.html() || "";
-    const markdown = turndownService.turndown(articleHtml);
+    // Get cleaned HTML (not markdown)
+    const cleanHtml = $article.html() || "";
+    
+    // Remove images but keep structure
+    const $cleaned = cheerio.load(cleanHtml);
+    $cleaned('img').remove();
+    const finalHtml = $cleaned.html();
 
-    const cleanMarkdown = markdown
-      .replace(/\[!\[.*?\]\(.*?\)\]\(.*?\)/g, "")
-      .replace(/!\[.*?\]\(.*?\)/g, "")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-
-    const wordCount = cleanMarkdown
+    // Count words from text content for stats
+    const textContent = $article.text();
+    const wordCount = textContent
       .split(/\s+/)
       .filter((word: string) => word.length > 0).length;
 
     return {
       title: title || "Untitled",
-      content: cleanMarkdown,
+      content: finalHtml,
       description,
       wordCount,
     };

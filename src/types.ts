@@ -29,7 +29,7 @@ export interface CoverageAssessment {
 export interface ContentData {
   url: string;
   title: string;
-  markdown: string;
+  markdown: string; // Actually cleaned HTML now, keeping name for compatibility
   description?: string;
   wordCount: number;
 }
