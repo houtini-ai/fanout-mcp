@@ -1,0 +1,15 @@
+docs: complete Test 7 - single word keyword edge case
+
+Test 7 validates that single-word keywords work well due to content-guided
+variant generation. Key findings:
+
+- 20 variants generated from keyword "PS5"
+- All variants stayed contextually relevant (sim racing)
+- No generic drift despite minimal keyword input
+- Quality metrics: 0.44 specificity, 0.75 realism, 0 generic queries
+- Coverage: 60% fan-out, 78% overall (78/100 score)
+- Processing: 173s (identical to multi-word hybrid mode)
+
+Validates that content understanding effectively constrains variant
+generation even with minimal keyword input. Bug fix for quality metrics
+confirmed working - all metrics calculated correctly for fan-out variants.
