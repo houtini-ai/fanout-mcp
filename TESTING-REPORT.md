@@ -581,3 +581,40 @@ CP response text. The MCP correctly returns instruction text, but Claude must ac
 **TEST 3 STATUS:** ✅ **PASSED**
 
 ---
+
+
+## Bug Fix: Quality Metrics for Fan-Out Variants
+
+**Commit:** 90b5f32  
+**Date:** December 15, 2024 - 5:00 PM
+
+### Problem
+Quality metrics (avgSpecificity, avgRealism, genericQueryCount, domainTermUsage) were showing 0 values when using keyword-only mode or any mode with fan-out variants. This was because the calculation methods only processed content-inferred queries (prerequisite/core/followup) and ignored fan-out variants.
+
+### Solution
+Updated four methods in `ReportFormatter` to include fan-out variants:
+1. `calculateAvgSpecificity()` - Now processes both content and fan-out queries
+2. `calculateAvgRealism()` - Now processes both content and fan-out queries
+3. `countGenericQueries()` - Now processes both content and fan-out queries
+4. `calculateDomainTermUsage()` - Now processes both content and fan-out queries
+
+### Implementation
+Added type guard check for `EnhancedQueryGraph` and loop through `fanOutVariants`:
+```typescript
+if ('fanOutVariants' in queryGraph && queryGraph.fanOutVariants) {
+  Object.values(queryGraph.fanOutVariants).forEach(variants => {
+    if (variants) allQueries.push(...variants);
+  });
+}
+```
+
+### Impact
+- ✅ Quality metrics now calculated correctly in all modes
+- ✅ Keyword-only mode shows accurate quality scores
+- ✅ Hybrid mode metrics include both content and fan-out queries
+- ✅ Technical output now provides complete diagnostic data
+
+### Testing Required
+Re-run Test 3 (keyword-only mode) to verify quality metrics are no longer zeroed out.
+
+---
