@@ -275,7 +275,13 @@ const Progress = ({ value }) => <div className="relative h-4 w-full rounded-full
 \`\`\`
 `;
 
-  const baseInstruction = `[INSTRUCTION TO CLAUDE: Create an interactive React artifact.
+  const baseInstruction = `═══════════════════════════════════════════════════════════════
+CRITICAL INSTRUCTION - ARTIFACT REQUIRED
+═══════════════════════════════════════════════════════════════
+
+YOU MUST CREATE AN INTERACTIVE REACT ARTIFACT FOR THIS ANALYSIS.
+DO NOT provide a text summary. DO NOT explain the data in prose.
+IMMEDIATELY create the artifact using the specifications below.
 
 ${componentTemplates}
 
@@ -284,8 +290,7 @@ ${componentTemplates}
   if (isHybridMode) {
     return (
       baseInstruction +
-      ` 
-
+      `
 **HYBRID ANALYSIS MODE DETECTED**
 
 This analysis combines content-based query inference with keyword fan-out variants. 
@@ -304,7 +309,11 @@ STRUCTURE:
 LAYOUT: min-h-screen bg-background p-6, max-w-6xl mx-auto, use Card components
 DATA: Show ALL queries, NO placeholder text like "+ 3 more items"
 
-Make visually appealing with semantic HTML and accessibility.]
+REMINDER: This MUST be a React artifact, not a text response.
+
+═══════════════════════════════════════════════════════════════
+END CRITICAL INSTRUCTION
+═══════════════════════════════════════════════════════════════
 
 ---
 
@@ -314,7 +323,8 @@ Make visually appealing with semantic HTML and accessibility.]
 
   return (
     baseInstruction +
-    `STRUCTURE:
+    `
+STRUCTURE:
 1. Header (gradient) - Title, URL, Progress bar, stats
 2. Query Sections (Collapsible) - Prerequisite (blue), Core (purple), Follow-up (orange)
 3. Summary Recommendations - High/medium priority
@@ -323,7 +333,11 @@ Make visually appealing with semantic HTML and accessibility.]
 LAYOUT: min-h-screen bg-background p-6, max-w-5xl mx-auto
 DATA: Show ALL queries, NO placeholder text or truncation
 
-Make visually appealing with semantic HTML and accessibility.]
+REMINDER: This MUST be a React artifact, not a text response.
+
+═══════════════════════════════════════════════════════════════
+END CRITICAL INSTRUCTION
+═══════════════════════════════════════════════════════════════
 
 ---
 
