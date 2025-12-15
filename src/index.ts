@@ -49,6 +49,64 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               description:
                 "Optional focus area for query generation (e.g., 'pricing', 'installation')",
             },
+            target_keyword: {
+              type: "string",
+              description:
+                "Enable keyword fan-out mode: generates query variants based on Google's methodology",
+            },
+            fan_out_types: {
+              type: "array",
+              items: {
+                type: "string",
+                enum: [
+                  "equivalent",
+                  "specification",
+                  "generalization",
+                  "followUp",
+                  "comparison",
+                  "clarification",
+                  "relatedAspects",
+                  "temporal",
+                ],
+              },
+              description:
+                "Which variant types to generate (default: equivalent, specification, followUp, comparison, clarification)",
+            },
+            fan_out_only: {
+              type: "boolean",
+              description:
+                "Skip content inference, only generate keyword variants",
+              default: false,
+            },
+            context: {
+              type: "object",
+              properties: {
+                temporal: {
+                  type: "object",
+                  properties: {
+                    currentDate: {
+                      type: "string",
+                      description: "Current date in YYYY-MM-DD format",
+                    },
+                    season: {
+                      type: "string",
+                      description: "Current season (winter, spring, summer, fall)",
+                    },
+                  },
+                },
+                intent: {
+                  type: "string",
+                  enum: ["shopping", "research", "navigation", "entertainment"],
+                  description: "User intent for contextual variant generation",
+                },
+                specificity_preference: {
+                  type: "string",
+                  enum: ["broad", "specific", "balanced"],
+                  description: "Preferred level of query specificity",
+                },
+              },
+              description: "Optional context signals for variant generation",
+            },
           },
           required: ["url"],
         },
