@@ -80,11 +80,118 @@ Analyze https://example.com/article for query coverage gaps
 - `url` (required) - URL of the content to analyze
 - `depth` (optional) - Analysis depth: `quick`, `standard` (default), or `comprehensive`
 - `focus_area` (optional) - Focus on specific topic (e.g., "pricing", "installation")
+- `target_keyword` (optional) - Enable keyword fan-out mode with query variant generation
+- `fan_out_types` (optional) - Variant types to generate (default: equivalent, specification, followUp, comparison, clarification)
+- `fan_out_only` (optional) - Skip content inference, only generate keyword variants
+- `context` (optional) - Context signals for variant generation (temporal, intent, specificity_preference)
 
 **Analysis Depths:**
 - **quick:** 5 queries (1 prerequisite, 3 core, 1 follow-up)
 - **standard:** 15 queries (3 prerequisite, 8 core, 4 follow-up)
 - **comprehensive:** 30 queries (6 prerequisite, 16 core, 8 follow-up)
+
+---
+
+## Analysis Modes
+
+### Mode 1: Content-Only (Default)
+
+Standard query decomposition based on content structure.
+
+```
+Analyze https://example.com/article with standard depth
+```
+
+### Mode 2: Hybrid (Content + Keyword Fan-Out)
+
+**NEW:** Combines content-based query inference with keyword fan-out variants using Google's research methodology.
+
+```
+Analyze https://example.com/sim-racing-wheels with target_keyword "direct drive sim racing wheels"
+```
+
+**What Is Keyword Fan-Out?**
+
+Based on Google's query expansion research, this mode generates 8 types of query variants:
+
+1. **Equivalent** - Alternative phrasings ("sim racing wheel" → "racing simulator wheel")
+2. **Specification** - More specific versions ("sim racing wheel" → "Fanatec DD Pro wheel review")
+3. **Generalization** - Broader versions ("direct drive wheels" → "force feedback wheels")
+4. **Follow-Up** - Logical next questions ("sim wheel" → "how to calibrate sim racing wheel")
+5. **Comparison** - "Vs" and alternative queries ("Fanatec vs Thrustmaster wheels")
+6. **Clarification** - Understanding questions ("what is direct drive technology")
+7. **Related Aspects** - Connected topics ("sim wheel compatibility with PC games")
+8. **Temporal** - Time-specific versions ("best sim racing wheels 2024")
+
+**Why Use Hybrid Mode?**
+
+- **Comprehensive Coverage:** See both what content naturally covers AND what users might search for
+- **SEO + GEO Optimization:** Optimize for both traditional search and AI search engines
+- **Keyword Targeting:** Ensure content addresses all variations of target keywords
+- **Gap Identification:** Find specific query variants your content misses
+
+### Mode 3: Keyword-Only
+
+Skip content inference, focus purely on keyword variants.
+
+```
+Analyze https://example.com/article with target_keyword "sim racing wheels" and fan_out_only true
+```
+
+---
+
+## Advanced Features
+
+### Context Signals
+
+Provide additional context for more relevant variant generation:
+
+```json
+{
+  "url": "https://example.com/sim-racing",
+  "target_keyword": "sim racing setup",
+  "context": {
+    "temporal": {
+      "currentDate": "2024-12-15",
+      "season": "winter"
+    },
+    "intent": "shopping",
+    "specificity_preference": "specific"
+  }
+}
+```
+
+**Context Options:**
+- `temporal.currentDate` - ISO date for temporal variants
+- `temporal.season` - Season for seasonal queries
+- `intent` - User intent: shopping, research, navigation, entertainment
+- `specificity_preference` - broad, specific, or balanced
+
+### Custom Variant Types
+
+Choose which variant types to generate:
+
+```json
+{
+  "url": "https://example.com/article",
+  "target_keyword": "sim racing",
+  "fan_out_types": ["equivalent", "specification", "comparison"]
+}
+```
+
+---
+
+## Based on Research
+
+The keyword fan-out methodology is based on Google's query expansion research:
+- Training Query Fan-Out Models with Generative Neural Networks
+- Google Patent US 11663201 B2: Query variant generation
+
+See `research/google-fanout-adaptation.md` for detailed implementation notes, what we adopted from the research, and what we adapted for our use case.
+
+**Key Adaptation:** We use Claude Sonnet 4.5 with prompt engineering instead of trained neural networks for flexibility and faster iteration whilst maintaining quality.
+
+---
 
 **Example Commands:**
 
@@ -94,6 +201,10 @@ Analyze https://driver61.com/sim-racing-guide with standard depth
 Quick analysis of https://example.com/pricing focusing on "cost"
 
 Comprehensive coverage check for https://example.com/installation-guide
+
+Hybrid analysis: https://example.com/wheels with keyword "direct drive sim racing wheels"
+
+Keyword-only analysis: https://example.com/article with keyword "sim racing cockpit" and fan_out_only true
 ```
 
 ---
@@ -108,8 +219,16 @@ Claude automatically creates a modern, interactive HTML artifact displaying:
 - Coverage score with animated gradient progress bar
 - Query breakdown statistics (covered/partial/gaps)
 - Color-coded sections (blue = prerequisite, purple = core, orange = follow-up)
+- **NEW:** Teal/cyan sections for keyword fan-out variants (in hybrid mode)
 - Expandable query cards showing evidence, gaps, and recommendations
 - Prioritized action items (high/medium priority)
+
+**Hybrid Mode Enhancements:**
+- Source keyword display
+- Variant type groupings with descriptions
+- Coverage distribution by variant type
+- "About Fan-Out Method" section explaining Google's approach
+- Clear visual separation between content-inferred vs keyword variants
 
 **Technical Analysis Section** (Collapsible):
 - **Content Metrics:** Characters, words, readability score, technical density, sentence/word statistics
@@ -148,7 +267,27 @@ Generates a query graph using Least-to-Most prompting:
 
 Uses `<thinking>` tags to prevent JSON parsing errors.
 
-### 3. Coverage Assessment
+### 2a. Keyword Fan-Out (Optional)
+**NEW:** When `target_keyword` is provided, generates query variants using Google's methodology:
+- **Equivalent variants:** Alternative phrasings with same intent
+- **Specification variants:** More specific versions with qualifiers
+- **Generalization variants:** Broader encompassing queries
+- **Follow-up variants:** Logical next questions
+- **Comparison variants:** "Vs" and alternative comparisons
+- **Clarification variants:** Understanding and definition queries
+- **Related Aspects variants:** Connected topics and implicit needs
+- **Temporal variants:** Time-specific versions with date qualifiers
+
+Each variant type includes 3-5 realistic user queries based on the target keyword and content context.
+
+### 3. Query Merging (Hybrid Mode)
+When both content inference and keyword fan-out are used:
+- Combines queries from both sources
+- Deduplicates similar queries (semantic similarity > 0.85)
+- Distributes fan-out variants into appropriate tiers
+- Maintains clear attribution for reporting
+
+### 4. Coverage Assessment
 Uses Self-RAG (Self-Reflective RAG) to validate coverage:
 - **COVERED:** Exact evidence found with quotes (90-100% confidence)
 - **PARTIAL:** Topic mentioned but incomplete (40-89% confidence)
@@ -156,7 +295,9 @@ Uses Self-RAG (Self-Reflective RAG) to validate coverage:
 
 Evidence quotes are extracted verbatim - no hallucinations.
 
-### 4. Technical Metrics Collection
+Works for both content-inferred queries AND keyword fan-out variants.
+
+### 5. Technical Metrics Collection
 Tracks comprehensive metrics throughout the analysis:
 - **Timing:** Per-phase breakdown (fetch, query generation, assessment)
 - **Content Quality:** Readability, technical density, structure
