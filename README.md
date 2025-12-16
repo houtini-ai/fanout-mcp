@@ -1,5 +1,6 @@
 # Fan-Out MCP
 
+[![Smithery MCP Server](https://smithery.ai/badge/@houtini/fanout-mcp)](https://smithery.ai/server/@houtini/fanout-mcp)
 [![npm version](https://img.shields.io/npm/v/@houtini/fanout-mcp.svg?style=flat-square)](https://www.npmjs.com/package/@houtini/fanout-mcp)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
