@@ -1,6 +1,6 @@
 {
   "name": "@houtini/fanout-mcp",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Advanced content gap analysis using Query Decomposition, Keyword Fan-Out, and Self-RAG for Generative Engine Optimization (GEO)",
   "type": "module",
   "main": "dist/index.js",
