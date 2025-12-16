@@ -173,11 +173,7 @@ export async function analyzeContentGap(
       totalTime,
     });
 
-    const instructionPrefix = buildInstructionPrefix(
-      target_keyword !== undefined
-    );
-
-    return instructionPrefix + report;
+    return report;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Content gap analysis failed: ${error.message}`);
@@ -254,100 +250,4 @@ function countVariantsByType(
   }
 
   return counts;
-}
-
-function buildInstructionPrefix(isHybridMode: boolean): string {
-  const componentTemplates = `
-VISUAL STYLE GUIDE COMPONENTS (Define at top):
-
-\`\`\`javascript
-const lucide = window.lucide;
-const ChevronDown = lucide?.ChevronDown;
-const ChevronUp = lucide?.ChevronUp;
-const CheckCircle = lucide?.CheckCircle;
-const AlertCircle = lucide?.AlertCircle;
-const XCircle = lucide?.XCircle;
-const Zap = lucide?.Zap;
-
-const Button = ({ children, variant = 'default', className = '', ...props }) => {
-  const variants = { default: 'bg-blue-600 text-white hover:bg-blue-700', outline: 'border border-gray-300 bg-white hover:bg-gray-50' };
-  return <button className={\`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors \${variants[variant]} \${className}\`} {...props}>{children}</button>;
-};
-const Card = ({ children, className = '' }) => <div className={\`rounded-lg border border-gray-200 bg-white shadow-sm \${className}\`}>{children}</div>;
-const Badge = ({ children, variant = 'default' }) => {
-  const variants = { success: 'bg-green-100 text-green-800 border-green-200', warning: 'bg-yellow-100 text-yellow-800 border-yellow-200', error: 'bg-red-100 text-red-800 border-red-200' };
-  return <span className={\`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold \${variants[variant]}\`}>{children}</span>;
-};
-const Progress = ({ value }) => <div className="relative h-4 w-full rounded-full bg-gray-200"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all" style={{ width: \`\${value}%\` }} /></div>;
-\`\`\`
-`;
-
-  const baseInstruction = `═══════════════════════════════════════════════════════════════
-CRITICAL INSTRUCTION - ARTIFACT REQUIRED
-═══════════════════════════════════════════════════════════════
-
-YOU MUST CREATE AN INTERACTIVE REACT ARTIFACT FOR THIS ANALYSIS.
-DO NOT provide a text summary. DO NOT explain the data in prose.
-IMMEDIATELY create the artifact using the specifications below.
-
-${componentTemplates}
-
-`;
-
-  if (isHybridMode) {
-    return (
-      baseInstruction +
-      `
-**HYBRID ANALYSIS MODE DETECTED**
-
-This analysis combines content-based query inference with keyword fan-out variants. 
-Display TWO main sections after the header:
-
-1. **Content-Inferred Queries** (standard 3-tier layout)
-2. **Keyword Fan-Out Analysis** (new section)
-
-STRUCTURE:
-1. Header (gradient bg) - Title with Zap icon, URL, keyword Badge, Progress bar, stats
-2. Content Queries - Collapsible sections (blue/purple/orange), Card components with status icons
-3. Fan-Out Analysis - Keyword Badge header, variant sections (teal/cyan), coverage summary
-4. About Fan-Out (Collapsible) - Link to https://arxiv.org/pdf/2210.12084, explain 8 types
-5. Technical Analysis (Collapsible) - Grid layout, metrics
-
-LAYOUT: min-h-screen bg-background p-6, max-w-6xl mx-auto, use Card components
-DATA: Show ALL queries, NO placeholder text like "+ 3 more items"
-
-REMINDER: This MUST be a React artifact, not a text response.
-
-═══════════════════════════════════════════════════════════════
-END CRITICAL INSTRUCTION
-═══════════════════════════════════════════════════════════════
-
----
-
-`
-    );
-  }
-
-  return (
-    baseInstruction +
-    `
-STRUCTURE:
-1. Header (gradient) - Title, URL, Progress bar, stats
-2. Query Sections (Collapsible) - Prerequisite (blue), Core (purple), Follow-up (orange)
-3. Summary Recommendations - High/medium priority
-4. Technical Analysis (Collapsible) - Grid metrics, JSON display
-
-LAYOUT: min-h-screen bg-background p-6, max-w-5xl mx-auto
-DATA: Show ALL queries, NO placeholder text or truncation
-
-REMINDER: This MUST be a React artifact, not a text response.
-
-═══════════════════════════════════════════════════════════════
-END CRITICAL INSTRUCTION
-═══════════════════════════════════════════════════════════════
-
----
-
-`
-  );
 }

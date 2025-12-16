@@ -22,7 +22,7 @@ export class ReportFormatter {
     }
   ): string {
     const report = this.buildReport(content, queryGraph, assessments, timings);
-    return this.generateMarkdown(report, this.isEnhancedGraph(queryGraph) ? queryGraph : undefined);
+    return JSON.stringify(report, null, 2);
   }
 
   private isEnhancedGraph(queryGraph: QueryGraph | EnhancedQueryGraph): queryGraph is EnhancedQueryGraph {
