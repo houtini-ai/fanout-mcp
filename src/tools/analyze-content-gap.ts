@@ -261,17 +261,24 @@ function buildInstructionPrefix(isHybridMode: boolean): string {
 VISUAL STYLE GUIDE COMPONENTS (Define at top):
 
 \`\`\`javascript
-const { ChevronDown, ChevronUp, CheckCircle, AlertCircle, XCircle, Zap } = window.lucide || {};
+const lucide = window.lucide;
+const ChevronDown = lucide?.ChevronDown;
+const ChevronUp = lucide?.ChevronUp;
+const CheckCircle = lucide?.CheckCircle;
+const AlertCircle = lucide?.AlertCircle;
+const XCircle = lucide?.XCircle;
+const Zap = lucide?.Zap;
+
 const Button = ({ children, variant = 'default', className = '', ...props }) => {
-  const variants = { default: 'bg-primary text-primary-foreground hover:bg-primary/90', outline: 'border border-input bg-background hover:bg-accent' };
+  const variants = { default: 'bg-blue-600 text-white hover:bg-blue-700', outline: 'border border-gray-300 bg-white hover:bg-gray-50' };
   return <button className={\`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors \${variants[variant]} \${className}\`} {...props}>{children}</button>;
 };
-const Card = ({ children, className = '' }) => <div className={\`rounded-lg border border-border bg-card shadow-sm \${className}\`}>{children}</div>;
+const Card = ({ children, className = '' }) => <div className={\`rounded-lg border border-gray-200 bg-white shadow-sm \${className}\`}>{children}</div>;
 const Badge = ({ children, variant = 'default' }) => {
-  const variants = { success: 'bg-green-100 text-green-800', warning: 'bg-yellow-100 text-yellow-800', error: 'bg-red-100 text-red-800' };
+  const variants = { success: 'bg-green-100 text-green-800 border-green-200', warning: 'bg-yellow-100 text-yellow-800 border-yellow-200', error: 'bg-red-100 text-red-800 border-red-200' };
   return <span className={\`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold \${variants[variant]}\`}>{children}</span>;
 };
-const Progress = ({ value }) => <div className="relative h-4 w-full rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: \`\${value}%\` }} /></div>;
+const Progress = ({ value }) => <div className="relative h-4 w-full rounded-full bg-gray-200"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all" style={{ width: \`\${value}%\` }} /></div>;
 \`\`\`
 `;
 
