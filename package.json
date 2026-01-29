@@ -1,6 +1,6 @@
 {
   "name": "@houtini/fanout-mcp",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "mcpName": "io.github.houtini-ai/fanout",
   "description": "Multi-URL comparative content analysis with topical gap detection",
   "type": "module",
