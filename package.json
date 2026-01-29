@@ -52,7 +52,7 @@
   ],
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
-    "@modelcontextprotocol/sdk": "latest",
+    "@modelcontextprotocol/sdk": "^1.24.3",
     "cheerio": "^1.0.0-rc.12",
     "fast-xml-parser": "^4.3.2",
     "node-fetch": "^3.3.2",
