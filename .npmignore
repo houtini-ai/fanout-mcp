@@ -45,5 +45,7 @@ npm-debug.log*
 !dist/
 !README.md
 !LICENSE
+!houtini-logo.jpg
+!server.json
 !research/keyword-fanout-explained.md
 !research/google-fanout-adaptation.md

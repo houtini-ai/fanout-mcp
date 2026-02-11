@@ -1,6 +1,6 @@
 {
   "name": "@houtini/fanout-mcp",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "mcpName": "io.github.houtini-ai/fanout",
   "description": "Multi-URL comparative content analysis with topical gap detection",
   "type": "module",
@@ -36,7 +36,7 @@
     "type": "git",
     "url": "git+https://github.com/houtini-ai/fanout-mcp.git"
   },
-  "homepage": "https://houtini.com",
+  "homepage": "https://houtini.com/query-fan-out-mcp-for-ai-search-optimisation/",
   "bugs": {
     "url": "https://github.com/houtini-ai/fanout-mcp/issues"
   },
@@ -47,14 +47,16 @@
     "dist",
     "README.md",
     "LICENSE",
+    "houtini-logo.jpg",
+    "server.json",
     "research/keyword-fanout-explained.md",
     "research/google-fanout-adaptation.md"
   ],
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
-    "@modelcontextprotocol/sdk": "^1.24.3",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "cheerio": "^1.0.0-rc.12",
-    "fast-xml-parser": "^4.3.2",
+    "fast-xml-parser": "^5.3.4",
     "node-fetch": "^3.3.2",
     "turndown": "^7.1.2",
     "zod": "^3.22.4"

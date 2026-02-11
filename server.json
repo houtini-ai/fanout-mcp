@@ -6,12 +6,19 @@
     "url": "https://github.com/houtini-ai/fanout-mcp",
     "source": "github"
   },
-  "version": "0.2.6",
+  "version": "0.2.8",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/houtini-ai/fanout-mcp/master/houtini-logo.jpg",
+      "mimeType": "image/jpeg"
+    }
+  ],
+  "websiteUrl": "https://houtini.com/query-fan-out-mcp-for-ai-search-optimisation/",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@houtini/fanout-mcp",
-      "version": "0.2.6",
+      "version": "0.2.8",
       "transport": {
         "type": "stdio"
       },
