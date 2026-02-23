@@ -14,7 +14,7 @@ import {
 const server = new Server(
   {
     name: "fanout-mcp",
-    version: "0.2.8",
+    version: "0.2.9",
   },
   {
     capabilities: {
@@ -155,7 +155,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
   }
 
-  throw new Error(`Unknown tool: ${name}`);
+  return {
+    content: [
+      {
+        type: "text",
+        text: `Unknown tool: ${name}`,
+      },
+    ],
+    isError: true,
+  };
 });
 
 async function main() {
