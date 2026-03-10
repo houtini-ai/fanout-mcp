@@ -12,6 +12,12 @@
 
 Analyze your content to discover what user queries it covers (and misses) using the same techniques AI search engines use internally.
 
+<p align="center">
+  <a href="https://glama.ai/mcp/servers/@houtini-ai/fanout-mcp">
+    <img width="380" height="200" src="https://glama.ai/mcp/servers/@houtini-ai/fanout-mcp/badge" alt="Fan-Out MCP server" />
+  </a>
+</p>
+
 ---
 
 ## Why This Matters
