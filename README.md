@@ -20,6 +20,12 @@ Analyze your content to discover what user queries it covers (and misses) using 
 
 ---
 
+> **Quick Navigation**
+>
+> [Why this matters](#why-this-matters) | [What it does](#what-it-does) | [Installation](#installation) | [How to use](#how-to-use) | [Methodology](#understanding-the-methodology) | [Features deep-dive](#features-deep-dive) | [Parameters](#tool-parameters-reference) | [Troubleshooting](#troubleshooting)
+
+---
+
 ## Why This Matters
 
 **The problem:** Traditional SEO focused on keywords and backlinks. AI search engines (ChatGPT, Perplexity, Gemini) don't work that way. They evaluate whether your content can answer user queries - across dozens of query variations you've probably never considered.
@@ -109,6 +115,22 @@ Plus detailed markdown report with all data.
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 3. **Restart Claude Desktop**
+
+### Claude Code (CLI)
+
+Claude Code uses a different registration mechanism -- it doesn't read `claude_desktop_config.json`. Use `claude mcp add` instead:
+
+```bash
+claude mcp add -e ANTHROPIC_API_KEY=sk-ant-... -s user fanout -- npx -y @houtini/fanout-mcp@latest
+```
+
+Verify with:
+
+```bash
+claude mcp get fanout
+```
+
+You should see `Status: Connected`.
 
 4. **Verify installation:**
 ```
