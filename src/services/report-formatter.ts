@@ -163,7 +163,7 @@ export class ReportFormatter {
         avgWordLength: Math.round(avgWordLength * 10) / 10,
       },
       queryDecomposition: {
-        modelUsed: "claude-sonnet-4-20250514",
+        modelUsed: "claude-sonnet-5",
         decompositionMethod: "3-tier hierarchical",
         totalQueries,
         distribution: {
@@ -191,7 +191,7 @@ export class ReportFormatter {
         }
       },
       selfRAG: {
-        modelUsed: "claude-sonnet-4-20250514",
+        modelUsed: "claude-sonnet-5",
         validationMethod: "evidence-based adversarial",
         coverageBreakdown: {
           fullyCovered: {

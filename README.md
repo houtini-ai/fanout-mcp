@@ -223,7 +223,7 @@ This tool implements techniques from cutting-edge Information Retrieval research
 This document explains:
 - Why query fan-out matters for content optimization
 - How Google's methodology works (in plain language)
-- Our adaptation using Claude Sonnet 4.5
+- Our adaptation using Claude Sonnet 5
 - Real examples from testing
 - When to use which variant types
 
@@ -573,7 +573,7 @@ Comprehensive test suite in `TESTING-REPORT.md`:
 ## Technology Stack
 
 - **MCP SDK** - Model Context Protocol for tool integration
-- **Anthropic SDK** - Claude Sonnet 4.5 for analysis
+- **Anthropic SDK** - Claude Sonnet 5 for analysis
 - **cheerio** - HTML parsing and content extraction
 - **turndown** - HTML to Markdown conversion
 - **TypeScript** - Type-safe implementation

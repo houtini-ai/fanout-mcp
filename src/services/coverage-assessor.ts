@@ -61,7 +61,7 @@ export class CoverageAssessor {
 
     try {
       const response = await this.client.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-5",
         max_tokens: 8000,
         messages: [
           {
