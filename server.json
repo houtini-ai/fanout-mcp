@@ -6,7 +6,7 @@
     "url": "https://github.com/houtini-ai/fanout-mcp",
     "source": "github"
   },
-  "version": "0.2.8",
+  "version": "0.2.11",
   "icons": [
     {
       "src": "https://raw.githubusercontent.com/houtini-ai/fanout-mcp/master/houtini-logo.jpg",
@@ -18,7 +18,7 @@
     {
       "registryType": "npm",
       "identifier": "@houtini/fanout-mcp",
-      "version": "0.2.8",
+      "version": "0.2.11",
       "transport": {
         "type": "stdio"
       },
