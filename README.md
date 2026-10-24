@@ -1,5 +1,7 @@
 # Fan-Out MCP
 
+[![Socket Badge](https://socket.dev/api/badge/npm/package/@houtini/fanout-mcp)](https://socket.dev/npm/package/@houtini/fanout-mcp)
+
 [![npm version](https://img.shields.io/npm/v/@houtini/fanout-mcp.svg?style=flat-square)](https://www.npmjs.com/package/@houtini/fanout-mcp)
 [![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue?style=flat-square)](https://registry.modelcontextprotocol.io)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
